@@ -1,77 +1,81 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import styled from 'styled-components';
 
-const inlineEditor = {
-  backgroundColor: 'white',
-  boxShadow: '0 0 5px silver',
-  borderRadius: '3px',
-  margin: '30px 20px',
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-};
+const Wrapper = styled.div`
+  background-color: white;
+  box-shadow: 0 0 5px silver;
+  border-radius: 3px;
+  margin: 30px 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: ${props => (props.edit ? 'auto' : `${props.height}px`)};
+  width: ${props => `${props.width}px`};
+`;
 
-const textToShow = {
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  padding: '0px 10px',
-};
+const TextToShow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0px 10px;
+  height: 100%;
+  width: 100%;
+`;
 
-const editable = {
-  display: 'flex',
-  justifyContent: 'flex-end',
-  alignItems: 'center',
-  flexWrap: 'wrap',
-  padding: '5px',
-  margin: '0px',
-  height: '100%',
-  width: '100%',
-};
+const Editor = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 5px;
+  margin: 0px;
+  height: 100%;
+  width: 100%;
+`;
 
-const button = {
-  width: '80px',
-  height: 'auto',
-  border: '1px solid #666',
-  margin: '0px',
-  marginRight: '5px',
-  padding: '5px',
-  borderRadius: '2px',
-  cursor: 'pointer',
-};
+const Button = styled.button`
+  width: 80px;
+  height: auto;
+  border: 1px solid #666;
+  margin: 0px;
+  margin-right: 5px;
+  padding: 5px;
+  border-radius: 2px;
+  cursor: pointer;
+`;
 
-const textArea = {
-  width: '100%',
-  marginBottom: '5px',
-  paddingLeft: '5px',
-  resize: 'none',
-  flexGrow: 1,
-  fontFamily: 'sans-serif',
-  paddingTop: '10px',
-};
+const TextArea = styled.textarea`
+  width: 100%;
+  margin-bottom: 5px;
+  padding-left: 5px;
+  resize: none;
+  flex-grow: 1;
+  font-family: sans-serif;
+  padding-top: 10px;
+  height: ${props => `${props.height}px`};
+`;
 
-const anchors = {
-  marginLeft: '20px',
-  textDecoration: 'none',
-};
+const Anchor = styled.a`
+  margin-left: 20px;
+  text-decoration: none;
+`;
 
-const edit = {
-  height: '100%',
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  marginLeft: '10px',
-  textDecoration: 'none',
-};
+const EditAnchor = styled.a`
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 10px;
+  text-decoration: none;
+`;
 
-const text = {
-  height: '100%',
-  flexWrap: 'wrap',
-};
+const Text = styled.p`
+  height: 100%;
+`;
 
 /* eslint-disable react/prefer-stateless-function */
-export class InlineEditor extends React.PureComponent {
+export default class InlineEditor extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {
@@ -99,14 +103,14 @@ export class InlineEditor extends React.PureComponent {
   showMore() {
     return event => {
       event.preventDefault();
-      this.setState({ isTruncated: false});
+      this.setState({ isTruncated: false });
     };
   }
 
   showLess() {
     return event => {
       event.preventDefault();
-      this.setState({ isTruncated: true});
+      this.setState({ isTruncated: true });
     };
   }
 
@@ -131,7 +135,8 @@ export class InlineEditor extends React.PureComponent {
       this.setState({
         previousText: this.state.currentText,
         edit: false,
-        isTruncated: this.isTruncable(this.state.currentText) && this.props.truncate,
+        isTruncated:
+          this.isTruncable(this.state.currentText) && this.props.truncate,
         isTruncable: this.isTruncable(this.state.currentText),
       });
     };
@@ -151,63 +156,55 @@ export class InlineEditor extends React.PureComponent {
 
   componentDidMount() {
     if (this.isTruncable(this.state.previousText) && this.props.truncate) {
-      this.setState({ isTruncated: true, isTruncable: true});
+      this.setState({ isTruncated: true, isTruncable: true });
     }
   }
 
   render() {
     return (
-      <div
-        style={{
-          ...inlineEditor,
-          minHeight: this.state.edit ? 'auto' : `${this.props.height}px`,
-          width: `${this.props.width}px`,
-        }}
+      <Wrapper
+        edit={this.state.edit}
+        height={this.props.height}
+        width={this.props.width}
       >
         {this.state.edit ? (
-          <div style={{ ...editable }}>
-            <textarea
+          <Editor>
+            <TextArea
               onChange={this.onChange()}
               autoFocus
               value={this.state.currentText}
-              style={{ ...textArea, height: `${this.props.height}px` }}
+              height={this.props.height}
             />
-            <button
-              type="button"
-              onClick={this.onCancel()}
-              style={{ ...button }}
-            >
-              Cancel
-            </button>
-            <button type="button" onClick={this.onSave()} style={{ ...button }}>
-              Save
-            </button>
-          </div>
+            <Button onClick={this.onCancel()}> Cancel </Button>
+            <Button onClick={this.onSave()}> Save </Button>
+          </Editor>
         ) : (
-          <div style={{ ...textToShow, width: '100%', height: '100%' }}>
-            <p style={{ ...text }}>
+          <TextToShow>
+            <Text>
               {this.props.truncate && this.state.isTruncated
                 ? this.truncateText(this.state.previousText)
                 : this.state.previousText}
-              {this.props.truncate && this.state.isTruncable && this.state.isTruncated? (
-                  <a style={{ ...anchors }} onClick={this.showMore()} href="/">
-                    Show More
-                  </a>
+              {this.props.truncate &&
+              this.state.isTruncable &&
+              this.state.isTruncated ? (
+                <Anchor onClick={this.showMore()} href="/">
+                  Show More
+                </Anchor>
               ) : null}
               {this.props.truncate &&
               this.state.isTruncable &&
               !this.state.isTruncated ? (
-                <a style={{ ...anchors }} onClick={this.showLess()} href="/">
+                <Anchor onClick={this.showLess()} href="/">
                   Show Less
-                </a>
+                </Anchor>
               ) : null}
-            </p>
-            <a style={{ ...edit }} onClick={this.editText()} href="/">
+            </Text>
+            <EditAnchor onClick={this.editText()} href="/">
               Edit
-            </a>
-          </div>
+            </EditAnchor>
+          </TextToShow>
         )}
-      </div>
+      </Wrapper>
     );
   }
 }
@@ -227,8 +224,3 @@ InlineEditor.propTypes = {
   truncate: PropTypes.bool,
   charLimit: PropTypes.number,
 };
-
-export default connect(
-  null,
-  null,
-)(InlineEditor);
